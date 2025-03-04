@@ -61,6 +61,31 @@ app.delete("/api/shoes/:id", async (req, res) => {
   }
 });
 
+app.put("/api/shoes/:id", async (req, res) => {
+  try {
+    const { name, price, image, adminPassword } = req.body;
+
+    if (adminPassword !== ADMIN_PASSWORD) {
+      return res.status(403).json({ error: "Incorrect admin password" });
+    }
+
+    const updatedShoe = await Shoe.findByIdAndUpdate(
+      req.params.id,
+      { name, price, image },
+      { new: true }
+    );
+
+    if (!updatedShoe) {
+      return res.status(404).json({ error: "Shoe not found" });
+    }
+
+    res.json(updatedShoe);
+  } catch (error) {
+    res.status(500).json({ message: "Error updating shoe" });
+  }
+});
+
+
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");
 });
